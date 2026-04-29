@@ -80,6 +80,29 @@ This enables:
    * Suggested complexity (if needed)
 
 ---
+## Architecture Flow
+
+```text
+User (Sales / Solutioning)
+        ↓
+Selects Level of Complexity (CRM)
+        ↓
+Product Grid (data.csv)
+        ↓
+Python Processing Layer (Pandas)
+        ↓
+AI Layer (OpenAI)
+        ↓
+-----------------------------------
+|  Summary                        |
+|  Justification                 |
+|  Validation                    |
+-----------------------------------
+        ↓
+Approver Decision
+(Faster, Informed Approval)
+```
+
 
 ## Example Output
 
