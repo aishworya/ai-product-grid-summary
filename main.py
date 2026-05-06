@@ -1,51 +1,36 @@
 import pandas as pd
-import os
 from openai import OpenAI
 
 # =========================
-# CONFIGURATION
+# CONFIG
 # =========================
-USE_AI = True  # 🔁 Change to True when you want real AI response
 
-# Simulating CRM field (Solution-level complexity)
-user_complexity = "Level 2"
+USE_AI = True  # Set False if you want demo mode
+
+# If using environment variable (recommended), keep this:
+client = OpenAI()
+
+# OR if you want to hardcode (not recommended):
+# client = OpenAI(api_key="your-api-key-here")
 
 # =========================
 # LOAD DATA
 # =========================
-try:
-    df = pd.read_csv("data.csv")
-except FileNotFoundError:
-    print("❌ data.csv file not found. Please check the file location.")
-    exit()
+
+df = pd.read_csv("data.csv")
+
+# Convert dataframe to text
+data_text = df.to_string(index=False)
+
+# Simulated user input (you can change this)
+user_complexity = 2
 
 # =========================
-# BASIC ANALYSIS
+# AI CALL / DEMO OUTPUT
 # =========================
-total_items = len(df)
-total_quantity = df["Quantity"].sum()
 
-category_summary = df.groupby("Category")["Quantity"].sum()
-
-# =========================
-# PRINT BASIC SUMMARY
-# =========================
-print("\n=== PRODUCT GRID SUMMARY ===")
-print(f"Total line items: {total_items}")
-print(f"Total quantity: {total_quantity}")
-
-print("\nCategory Breakdown:")
-for category, qty in category_summary.items():
-    print(f"- {category}: {qty}")
-
-print(f"\nUser Selected Complexity: {user_complexity}")
-
-# =========================
-# PREPARE DATA FOR AI
-# =========================
-data_text = df.to_string()
-
-prompt = f"""
+if USE_AI:
+    prompt = f"""
 You are a network solutions expert reviewing a CRM solution.
 
 Product grid:
@@ -54,54 +39,146 @@ Product grid:
 User selected complexity: {user_complexity}
 
 Tasks:
-1. Summarize the overall solution
-2. Generate a justification for the selected complexity
-3. Evaluate if the selected complexity is appropriate (Yes/No)
-4. If not appropriate, suggest the correct level (0–3)
-5. Provide clear reasoning
+1. Summarize the solution
+2. Justify the selected complexity
+3. Validate if the complexity is appropriate (Yes/No)
+4. Suggest correct complexity (0–3 if needed)
+5. Provide a confidence score (0 to 100)
 
-Keep the response concise and professional for an approval workflow.
+Output format:
+
+Summary:
+...
+
+Justification:
+...
+
+Validation:
+...
+
+Suggested Complexity:
+...
+
+Confidence:
+...
 """
 
-# =========================
-# AI / DEMO OUTPUT
-# =========================
-print("\n=== AI ANALYSIS ===\n")
-
-if USE_AI:
     try:
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "user", "content": prompt}
-            ],
-            max_tokens=300
+            ]
         )
-
         ai_output = response.choices[0].message.content
-        print(ai_output)
 
     except Exception as e:
-        print("❌ Error while calling AI:")
-        print(e)
-else:
-    # 🔹 Demo mode (for GitHub / sharing)
-    demo_output = """
+        print("Error while calling AI:", e)
+        ai_output = "AI failed. Switching to demo output."
+        USE_AI = False
+
+# Demo output if AI is off or fails
+demo_output = """
 Summary:
-The solution includes multiple network components such as routers and switches along with service elements.
+Basic network setup with limited integrations.
 
 Justification:
-The presence of network infrastructure combined with services indicates moderate implementation effort.
+The number of components and integrations is moderate.
 
 Validation:
-Yes, the selected complexity appears appropriate.
+Yes
 
 Suggested Complexity:
-Level 2
+2
 
-Reason:
-The scale of hardware and inclusion of services aligns with a medium level of effort and design involvement.
+Confidence:
+85
 """
+
+# =========================
+# PRINT AI OUTPUT
+# =========================
+
+print("\n=== AI ANALYSIS ===\n")
+
+if USE_AI:
+    print(ai_output)
+else:
     print(demo_output)
+
+# =========================
+# CONFIDENCE FUNCTIONS
+# =========================
+
+def extract_confidence(ai_text):
+    try:
+        for line in ai_text.split("\n"):
+            if "confidence" in line.lower():
+                return line.split(":")[-1].strip()
+    except:
+        return "Unknown"
+    return "Unknown"
+
+
+def decision_from_confidence(conf):
+    try:
+        score = int(conf.replace("%", "").strip())
+        if score >= 75:
+            return "APPROVE"
+        elif score >= 50:
+            return "REVIEW REQUIRED"
+        else:
+            return "HIGH RISK – RECHECK"
+    except:
+        return "REVIEW REQUIRED"
+
+# =========================
+# APPLY CONFIDENCE LOGIC
+# =========================
+
+confidence = extract_confidence(ai_output if USE_AI else demo_output)
+
+print("\n=== CONFIDENCE SCORE ===")
+print(confidence)
+
+decision = decision_from_confidence(confidence)
+
+print("\n=== FINAL DECISION ===")
+print(decision)
+
+# =========================
+# EMAIL GENERATION
+# =========================
+
+def generate_email(ai_text, user_complexity, confidence, decision):
+    email = f"""
+Subject: Complexity Review – Approval Required
+
+Dear Approver,
+
+A solution has been submitted with Level of Complexity:
+{user_complexity}
+
+AI Assessment:
+{ai_text}
+
+Confidence: {confidence}
+Recommendation: {decision}
+
+Please review and confirm.
+
+Regards,
+AI Assistant
+"""
+    return email
+
+
+email_output = generate_email(
+    ai_output if USE_AI else demo_output,
+    user_complexity,
+    confidence,
+    decision
+)
+
+print("\n=== APPROVAL EMAIL ===")
+print(email_output)
