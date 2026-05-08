@@ -84,6 +84,7 @@ pip install pandas openai
 $env:OPENAI_API_KEY="your_api_key_here"
 4. Run the script:
 python main.py
+```
 
 Disclaimer
 
