@@ -1,6 +1,6 @@
 # AI-Based CRM Approval Assistant (POC)
 
-## 📌 Overview
+## Overview
 
 In CRM systems, pricing often depends on the **level of complexity** of a solution. However, complexity is subjective and inconsistently defined (e.g., "high design effort", "significant consulting").
 
@@ -16,7 +16,7 @@ This project is a **Proof of Concept (POC)** that uses AI to:
 
 ---
 
-## 🚀 Features
+##  Features
 
 - Product grid summarization
 - AI-based complexity validation
@@ -25,7 +25,7 @@ This project is a **Proof of Concept (POC)** that uses AI to:
 
 ---
 
-## 🧠 How It Works
+##  How It Works
 User selects complexity in CRM
 ↓
 Product Grid Data (CSV)
@@ -45,7 +45,9 @@ Approval Email Output
 
 ---
 
-## 🛠️ Tech Stack
+
+
+##  Tech Stack
 
 - Python
 - Pandas
@@ -53,25 +55,7 @@ Approval Email Output
 
 ---
 
-## ▶️ How to Run
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/aishworya/ai-product-grid-summary.git
-cd ai-product-grid-summary
-
----
-
-## 🛠️ Tech Stack
-
-- Python
-- Pandas
-- OpenAI API
-
----
-
-## ▶️ How to Run
+## How to Run
 
 1. Clone the repository:
 
@@ -89,7 +73,7 @@ python main.py
 Disclaimer
 
 This is a Proof of Concept and not a production-ready system.
-## 📸 Sample Output
+##  Sample Output
 
 ![Output](output.png)
 
