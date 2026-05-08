@@ -91,8 +91,6 @@ This is a Proof of Concept and not a production-ready system.
 ## 📸 Sample Output
 
 ![Output](output.png)
-<img width="947" height="389" alt="image" src="https://github.com/user-attachments/assets/68875145-94ff-4819-9308-6a4978256f12" />
-<img width="946" height="443" alt="image" src="https://github.com/user-attachments/assets/ac5ca6ba-81cb-4fbd-a6cd-9f225826b775" />
-<img width="341" height="158" alt="image" src="https://github.com/user-attachments/assets/c0103dbb-9736-412d-8792-87a1172fa0af" />
+
 
 
